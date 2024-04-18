@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Wysyłanie Formularza</title>
+</head>
+<body>
+<h1>Formularz Wysyłania</h1>
+<form id="myForm" method="post">
+    <label for="password">Imię:</label>
+    <input type="password" id="password" name="pass" required><br><br>
+
+    <label for="passwordRes">Email:</label>
+    <input type="password" id="passwordRes" name="passCp" required><br><br>
+
+    <button type="submit">Wyślij</button>
+</form>
+<script>
+    // Wyłapywanie zdarzenia submit formularza
+    document.getElementById('myForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Zapobieganie standardowemu wysłaniu formularza
+
+        // Pobieranie danych z formularza
+        var formData = {
+            pass: document.getElementById('password').value,
+            passCp: document.getElementById('passwordRes').value
+        };
+
+        // Wysyłanie danych jako JSON
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = 'http://localhost:5173/login';
+                } else {
+                    throw new Error('Something went wrong');
+                }
+            })
+            .catch(error => console.error('Error:', error)); // Obsługa błędów
+    });
+</script>
+</body>
+</html>
