@@ -17,8 +17,7 @@ type Pass struct {
 	PassCp string `json:"passCp"`
 }
 
-func (h *Handlers) ChangePasswdRequest(w http.ResponseWriter, r *http.Request) {
-
+func (h *Handlers) ChangePasswordInDatabase(w http.ResponseWriter, r *http.Request) {
 	isOK, id := Contains(h.links, r.URL.Query().Get("code"))
 	if !isOK {
 		views.ResponseWithError(w, 401, "bad link")

@@ -9,5 +9,5 @@ export default function Redirect() {
         navigate('/login');
     }, [navigate]);
 
-    return null;  // lub może zwracać jakiś element ładowania, np. <div>Loading...</div>
+    return null;
 }

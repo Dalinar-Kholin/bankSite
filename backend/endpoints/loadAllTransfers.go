@@ -3,6 +3,7 @@ package endpoints
 import (
 	"WDB/views"
 	"fmt"
+	"html"
 	"net/http"
 	"strconv"
 )
@@ -13,33 +14,37 @@ type Transfer struct {
 	Value   int
 }
 
-func (h *Handlers) GetTransfers(w http.ResponseWriter, r *http.Request) {
+type TransferCalculated struct {
+	Sender  string
+	Reciver string
+	Value   int
+}
 
-	cookie, err := r.Cookie("accessToken")
+func (h *Handlers) LoadAllTransfer(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.Header.Get("id"))
 	if err != nil {
-		views.ResponseWithError(w, 401, "where cookie?")
-		return
+		fmt.Printf("err := %v", err)
 	}
-	id, _ := strconv.Atoi(r.URL.Query().Get("id"))
-
-	fmt.Printf("id := %v\n")
-	res, err := h.DB.Query("select sender from transfers where sender = ? ", id)
-	cookie.Value = "asd"
+	res, err := h.DB.Query("select sender, reciver, value from transfers where sender = ? || reciver = ?", id, id)
 	if err != nil {
+		fmt.Printf("err = %v", err)
 		views.ResponseWithError(w, 500, "Error querying the database")
 		return
 	}
 	defer res.Close() // Zamknij wynik zapytania na koniec obsługi
 
 	var transfers []Transfer
+	var transfersCalculated []TransferCalculated
 	for res.Next() {
 		var transfer Transfer
+		var transferCalculated TransferCalculated
 		// zakładając, że tabela 'transfers' ma kolumny 'sender', 'receiver' i 'value'
-		if err := res.Scan(&transfer.Sender /*, &transfer.Reciver, &transfer.Value*/); err != nil {
+		if err := res.Scan(&transfer.Sender, &transfer.Reciver, &transfer.Value); err != nil {
 			views.ResponseWithError(w, 500, "Error reading data")
 			return
 		}
-
+		transferCalculated.Value = transfer.Value
+		transfersCalculated = append(transfersCalculated, transferCalculated)
 		transfers = append(transfers, transfer) // dynamiczne dodawanie do slice
 	}
 
@@ -47,5 +52,35 @@ func (h *Handlers) GetTransfers(w http.ResponseWriter, r *http.Request) {
 		views.ResponseWithError(w, 500, "Error after iterating over results")
 		return
 	}
-	views.ResponseWithJSON(w, 200, transfers) // odpowiedź JSON z listą transferów
+
+	nicks, err := h.DB.Query("select distinct users.id,login from users inner join transfers on users.id = transfers.sender || users.id = transfers.reciver where reciver= ? || transfers.sender= ?;", id, id)
+	if err != nil {
+		fmt.Printf("err = %v", err)
+		views.ResponseWithError(w, 501, "bad server")
+		return
+	}
+	mapa := make(map[int]string)
+	for nicks.Next() {
+		var idFromBase int
+		var login string
+		// zakładając, że tabela 'transfers' ma kolumny 'sender', 'receiver' i 'value'
+		if err := nicks.Scan(&idFromBase, &login); err != nil {
+			fmt.Printf("err := %v\n", err)
+			views.ResponseWithError(w, 500, "Error reading data")
+			return
+		}
+		fmt.Printf("login %v %v", login, idFromBase)
+		mapa[idFromBase] = login
+	}
+	if err := nicks.Err(); err != nil {
+		views.ResponseWithError(w, 500, "wtf err")
+		return
+	}
+	defer nicks.Close()
+	for i, x := range transfers {
+		transfersCalculated[i].Sender = html.EscapeString(mapa[x.Sender])
+		transfersCalculated[i].Reciver = html.EscapeString(mapa[x.Reciver])
+	}
+
+	views.ResponseWithJSON(w, 200, transfersCalculated) // odpowiedź JSON z listą transferów
 }

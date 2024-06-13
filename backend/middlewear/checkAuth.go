@@ -3,6 +3,7 @@ package middlewear
 import (
 	"WDB/views"
 	"net/http"
+	"strconv"
 )
 
 func (m *Middlewear) CheckToken(next http.HandlerFunc) http.HandlerFunc {
@@ -12,14 +13,14 @@ func (m *Middlewear) CheckToken(next http.HandlerFunc) http.HandlerFunc {
 			views.ResponseWithError(w, 401, "where Cookie?")
 			return
 		}
-		var id int
-		err = m.DB.QueryRow("SELECT id FROM users WHERE token=?", cookie.Value).Scan(&id)
+		var Id int
+		err = m.DB.QueryRow("SELECT id FROM users WHERE token=?", cookie.Value).Scan(&Id)
 		if err != nil {
 			println(err.Error())
 			views.ResponseWithError(w, http.StatusUnauthorized, "unauthorize")
 			return
 		}
-		r.URL.Query().Add("id", string(id))
+		r.Header.Add("id", strconv.Itoa(Id))
 		next(w, r)
 	}
 }

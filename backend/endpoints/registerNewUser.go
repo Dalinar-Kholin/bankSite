@@ -21,17 +21,17 @@ type UserData struct {
 	Email    string `json:"email"`
 }
 
-func (h *Handlers) AddUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) RegisterNewUser(w http.ResponseWriter, r *http.Request) {
 	var userData UserData
 	bodyReader, _ := io.ReadAll(r.Body)
 	err := json.Unmarshal(bodyReader, &userData)
 	if err != nil {
 		fmt.Printf("%v\n", err)
-		views.ResponseWithError(w, 400, "bad request")
+		views.ResponseWithError(w, 400, "bad request 1")
 		return
 	}
 	if !checkers.CheckCredsAll(userData.Password, userData.Email, userData.Login) {
-		views.ResponseWithError(w, 400, "bad request")
+		views.ResponseWithError(w, 400, "bad request 2")
 		return
 	}
 
@@ -65,6 +65,7 @@ func (h *Handlers) AddUser(w http.ResponseWriter, r *http.Request) {
 	hash := argon2.Key([]byte(password), salt, iterations, memory, parallelism, keyLen)
 	fmt.Printf("argon %v\n sól %v\n", hash, salt)
 	computedHash := ComputeHMAC(hex.EncodeToString(hash), h.Pepper)
+
 	_, err = h.DB.Exec("INSERT INTO users (login, passwd, email,salt, saldo) VALUES (?, ?, ?, ?, ?);", userData.Login, computedHash, userData.Email, hex.EncodeToString(salt), 0)
 	fmt.Printf("%v\n", err)
 	if err != nil {

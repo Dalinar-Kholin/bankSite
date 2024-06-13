@@ -5,7 +5,7 @@ func CheckCredsLoginPass(login string, pass string) bool {
 }
 
 func CheckCredsLoginEmail(login string, email string) bool {
-	return true //ValidateEmail(email) && ValidateUsername(login)
+	return ValidateEmail(email) && ValidateUsername(login)
 }
 
 func CheckCredsAll(pass string, email string, login string) bool {

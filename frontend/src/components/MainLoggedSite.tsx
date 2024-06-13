@@ -1,11 +1,12 @@
 import {useNavigate} from "react-router-dom";
 import useCheckCookie from "../customHook/useCheckCookie.ts";
 
-export default function MainSite(){
+export default function MainLoggedSite() {
     const navigate = useNavigate();
     useCheckCookie()
 
-    return(
+
+    return (
         <>
             <button onClick={() => {
                 navigate("/makeTransfer")
@@ -16,6 +17,15 @@ export default function MainSite(){
                 navigate("/getTransfer")
             }}>get transfers
             </button>
+            <p></p>
+            {
+                sessionStorage.getItem("isAdmin")==="true"
+                    ?
+                    <button onClick={() => {navigate("/acceptTransfers")}}>
+                        accept Transfers
+                    </button>
+                    :
+                    <></>}
         </>
     )
 }

@@ -1,5 +1,6 @@
 import useCheckCookie from "../customHook/useCheckCookie.ts";
 import {useState} from "react";
+import fetchWithSession from "../sessionFetch.ts";
 
 interface IResponse{
     link : string
@@ -21,6 +22,7 @@ export default function MakeTransfer(){
     const [to, setTo] = useState<string>("")
     const [amount, setAmount] = useState<string>("")
     const [isOK, setIsOK] = useState<boolean>(false)
+    const [title, setTitle] = useState<string>("")
     var isResponseOK = false
     return(
         <>
@@ -29,19 +31,21 @@ export default function MakeTransfer(){
             {
                 e.preventDefault()
                 const request = {
-                    reciver: to,
+                    reciver: to, //isValidUsername(to) ? to : ""
                     amount: +amount,
+                    title: title,
                 }
 
-                fetch('https://127.0.0.1:8080/acceptTransaction', {
+                fetchWithSession('https://127.0.0.1:8080/initTransaction', {
                     method: 'POST',
                     body: JSON.stringify(request),
-                    credentials: 'include'
+                    credentials: 'include',
                 })
                     .then(response => {
                         if (!response.ok) {
                             setTo("");
                             setAmount("");
+                            setTitle("");
                             isResponseOK=false
                             return response.json()
                         }
@@ -77,6 +81,8 @@ export default function MakeTransfer(){
                 <input value={to} onChange={(e) => setTo(e.target.value)}/>
                 <p>amount</p>
                 <input value={amount} onChange={(e) => setAmount(e.target.value)}/>
+                <p>title</p>
+                <input value={title} onChange={(e) => setTitle(e.target.value)}/>
                 <p></p>
                 <button type="submit">{"send"}</button>
                 <p>{ isOK ? <a href={respones.link}>link do potwierdzenia transakcji</a> : respones.link ? respones.link : "nie udało się :(("}</p>

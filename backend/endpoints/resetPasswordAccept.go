@@ -16,8 +16,8 @@ func Contains(tab []ChangePassData, link string) (bool, int) {
 	return false, -1
 }
 
-func (h *Handlers) ResetPassPage(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("%v %v\n", r.URL.Query().Get("code"), h.links)
+func (h *Handlers) ResetPassAccept(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("reset pass Accept %v %v\n", r.URL.Query().Get("code"), h.links)
 	isOK, _ := Contains(h.links, r.URL.Query().Get("code"))
 	if !isOK {
 		views.ResponseWithError(w, 401, "nieładnie :(")
@@ -32,8 +32,8 @@ func (h *Handlers) ResetPassPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Nie można odczytać pliku", 500)
 		return
 	}
-
+	html := HashPage(string(htmlContent))
 	// Ustawienie typu treści odpowiedzi na HTML
 	w.Header().Set("Content-Type", "text/html")
-	w.Write(htmlContent)
+	w.Write([]byte(html))
 }

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'sha256-hashPlaceholder'">
+    <title>accept Transaction</title>
+</head>
+<body style="place-items: center">
+<div style="display: flex">
+<div id="From"></div> &nbsp;-->&nbsp; <div id="To"></div> &nbsp;&nbsp;&nbsp;=>&nbsp;&nbsp;&nbsp; $<div id="Amount"></div>
+<p></p>
+</div>
+<div style="display: flex">
+<div>title :=</div>&nbsp; <div id="Title"></div>
+</div>
+<br>
+<form id="myForm" method="post">
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="pass" required><br><br>
+    <button id="submit" type="submit">Wyślij</button>
+</form>
+<br>
+<p id="response"></p>
+<script>
+    const From = "PlaceholderForFrom";
+    const To = "PlaceholderForTo";
+    const Amount = "PlaceholderForAmount";
+    const Title = "PlaceholderForTitle";
+
+    // Ustawienie wartości dla elementów h1 po załadowaniu strony
+    window.onload = function() {
+        document.getElementById("From").textContent = From;
+        document.getElementById("To").textContent = To;
+        document.getElementById("Amount").textContent = Amount;
+        document.getElementById("Title").textContent = Title;
+    };
+
+    document.getElementById("submit").addEventListener("click", function(e) {
+        e.preventDefault();
+
+        const formData = {
+            pass: document.getElementById('password').value,
+        };
+
+        // Wysyłanie danych jako JSON
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData) //dane są dane z servera, a potem na wejściu do servera są ponownie sprawdzane wiec nic tutaj nie może się stać(a przynajmniej jestem na to za głupi aby to zobaczyc )
+        })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById("response").textContent = "Udało się zrealizować przelew :)), możesz go zobaczyć w historii";
+                    document.getElementById("password").textContent="";
+                } else {
+                    document.getElementById("response").textContent= "nie udało się, złe dane :(("
+                    document.getElementById("password").textContent=""
+                    throw new Error('Something went wrong');
+                }
+            })
+            .catch(error => console.error('Error:', error)); // Obsługa błędów
+    });
+</script>
+</body>
+</html>

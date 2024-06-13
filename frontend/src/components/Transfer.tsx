@@ -6,7 +6,7 @@ interface IItem{
     amount : number
 }
 
-export default function Item({from,to,amount}: IItem){
+export default function Transfer({from,to,amount}: IItem){
     return(
         <h3>
             {from}{'---->'}{to} {'$'}{amount}

@@ -2,28 +2,38 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'sha256-hashPlaceholder'">
     <title>Wysyłanie Formularza</title>
 </head>
 <body>
 <h1>Formularz Wysyłania</h1>
 <form id="myForm" method="post">
-    <label for="password">Imię:</label>
+    <label for="password">Password:</label>
     <input type="password" id="password" name="pass" required><br><br>
 
-    <label for="passwordRes">Email:</label>
+    <label for="passwordRes">Repeat Password:</label>
     <input type="password" id="passwordRes" name="passCp" required><br><br>
 
     <button type="submit">Wyślij</button>
 </form>
 <script>
+
+    function isValidPassword(password){
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,32}$/;
+        return regex.test(password);
+    }
+
     // Wyłapywanie zdarzenia submit formularza
     document.getElementById('myForm').addEventListener('submit', function(event) {
         event.preventDefault(); // Zapobieganie standardowemu wysłaniu formularza
 
+
+        const pass = document.getElementById('password').value
+        const res = document.getElementById('passwordRes').value
         // Pobieranie danych z formularza
-        var formData = {
-            pass: document.getElementById('password').value,
-            passCp: document.getElementById('passwordRes').value
+        const formData = {
+            pass: isValidPassword(pass)? pass : "",
+            passCp: isValidPassword(res) ? res : ""
         };
 
         // Wysyłanie danych jako JSON

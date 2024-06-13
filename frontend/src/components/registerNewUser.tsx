@@ -1,8 +1,11 @@
 import {useState} from "react";
 import { useNavigate } from 'react-router-dom';
+import isValidUsername from "../checker/checkLogin.ts";
+import isValidPassword from "../checker/checkPass.ts";
+import isValidEmail from "../checker/checkEmail.ts";
 
 
-export default function RegisterBox(){
+export default function RegisterNewUser(){
     const [userName, setUserName] = useState<string>("")
     const [pass, setPass] = useState<string>("")
     const [email, setEmail] = useState<string>("")
@@ -19,12 +22,12 @@ export default function RegisterBox(){
                     e.preventDefault();
                     navigate("/main")
                     const request = {
-                        login : userName,
-                        pass : pass,
-                        email : email
+                        login : isValidUsername(userName) ? userName : "",
+                        pass : isValidPassword(pass)? pass : "",
+                        email : isValidEmail(email) ? email : ""
                     }
 
-                    fetch('https://127.0.0.1:8080/addUser', {
+                    fetch('https://127.0.0.1:8080/api/registerNewUser', {
                         method : 'Post',
                         body : JSON.stringify(request)
                     })

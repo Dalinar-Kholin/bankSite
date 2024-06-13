@@ -1,5 +1,7 @@
 import {useState} from "react";
 import axios from "axios";
+import isValidEmail from "../checker/checkEmail.ts";
+import isValidUsername from "../checker/checkLogin.ts";
 
 export default function ResetPasswd(){
     const [email, setEmail] = useState<string>("")
@@ -9,10 +11,9 @@ export default function ResetPasswd(){
         <>
             <form
                 onSubmit={(e) => {
-                    e.preventDefault()
-                    axios.post("https://127.0.0.1:8080/resetPassword",{
-                        login:login,
-                        email: email,
+                    axios.post("https://127.0.0.1:8080/api/resetPassword",{
+                        login: isValidUsername(login)? login : "",
+                        email: isValidEmail(email) ? email : "",
                     }).then(
                         (r)=>{
                             console.log(r.data)
@@ -25,6 +26,7 @@ export default function ResetPasswd(){
                     ).catch(()=>{
                         setStatus("bad data")
                     })
+                    e.preventDefault()
                 }}>
                 <input
                     placeholder={"email"}

@@ -1,26 +1,31 @@
 import './App.css'
-import LoginPage from "./components/LoginBox.tsx";
+import LoginPage from "./components/Login.tsx";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import MainSite from "./components/mainSite.tsx";
-import RegisterBox from "./components/registerBox.tsx";
+import MainLoggedSite from "./components/MainLoggedSite.tsx";
+import RegisterNewUser from "./components/registerNewUser.tsx";
 import Redirect from "./components/Redirect.tsx";
 import ResetPasswd from "./components/resetPasswd.tsx";
-import GetTransfers from "./components/getTransfers.tsx";
-import MakeTransfer from "./components/newTransfer.tsx";
+import LoadTransferSent from "./components/LoadTransferSent.tsx";
+import MakeTransfer from "./components/initNewMoneyTransfer.tsx";
+import AcceptTransfers from "./components/acceptTransfers.tsx";
 
 function App() {
     return (
+        <>
+
         <Router>
             <Routes>
-                <Route path="/register" element={<RegisterBox />} />
+                <Route path="/register" element={<RegisterNewUser />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/" element={<Redirect />} />
-                <Route path="/main" element={<MainSite />} />
+                <Route path="/main" element={<MainLoggedSite />} />
                 <Route path="/resetPassword" element={<ResetPasswd />} />
-                <Route path={"/getTransfer"} element={<GetTransfers/>}/>
+                <Route path={"/getTransfer"} element={<LoadTransferSent/>}/>
                 <Route path={"/makeTransfer"} element={<MakeTransfer/>}/>
+                <Route path="/acceptTransfers" element={<AcceptTransfers link={"https://127.0.0.1:8080/acceptTransfer"}/>}/>{/* potwierdzanie przelewów*/}
             </Routes>
         </Router>
+        </>
     );
 }
 export default App;
