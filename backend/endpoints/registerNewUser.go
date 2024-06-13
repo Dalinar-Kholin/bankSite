@@ -65,7 +65,7 @@ func (h *Handlers) AddUser(w http.ResponseWriter, r *http.Request) {
 	hash := argon2.Key([]byte(password), salt, iterations, memory, parallelism, keyLen)
 	fmt.Printf("argon %v\n sól %v\n", hash, salt)
 	computedHash := ComputeHMAC(hex.EncodeToString(hash), h.Pepper)
-	_, err = h.DB.Exec("INSERT INTO users (login, passwd, email,salt) VALUES (?, ?, ?, ?);", userData.Login, computedHash, userData.Email, hex.EncodeToString(salt))
+	_, err = h.DB.Exec("INSERT INTO users (login, passwd, email,salt, saldo) VALUES (?, ?, ?, ?, ?);", userData.Login, computedHash, userData.Email, hex.EncodeToString(salt), 0)
 	fmt.Printf("%v\n", err)
 	if err != nil {
 		views.ResponseWithError(w, 500, "Internal Server Error")

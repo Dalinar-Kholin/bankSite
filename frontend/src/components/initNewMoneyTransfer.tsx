@@ -1,11 +1,27 @@
 import useCheckCookie from "../customHook/useCheckCookie.ts";
 import {useState} from "react";
 
+interface IResponse{
+    link : string
+    from : string
+    to : string
+    amount : number
+}
+
+
 export default function MakeTransfer(){
     useCheckCookie()
+    const initial : IResponse =  {
+        link : "",
+        from : "",
+        to : "",
+        amount : 0,
+    }
+    const [respones, setRespones] = useState<IResponse>(initial)
     const [to, setTo] = useState<string>("")
     const [amount, setAmount] = useState<string>("")
-    const [status, setStatus] = useState<string>("")
+    const [isOK, setIsOK] = useState<boolean>(false)
+    var isResponseOK = false
     return(
         <>
             <form
@@ -14,7 +30,7 @@ export default function MakeTransfer(){
                 e.preventDefault()
                 const request = {
                     reciver: to,
-                    amount: amount,
+                    amount: +amount,
                 }
 
                 fetch('https://127.0.0.1:8080/acceptTransaction', {
@@ -26,15 +42,31 @@ export default function MakeTransfer(){
                         if (!response.ok) {
                             setTo("");
                             setAmount("");
-                            throw new Error('Network response was not ok.');
+                            isResponseOK=false
+                            return response.json()
                         }
+                        isResponseOK= true
                         return response.json(); // Przetwarzanie odpowiedzi JSON tylko gdy response.ok
                     })
                     .then(data => {
-                        console.log(data);
+                        console.log(isResponseOK)
+                        if (isResponseOK){
+                            console.log(data)
+                            setRespones(data)
+                            setIsOK(true)
+                        }else{
+                            setRespones(prevState => ({
+                                ...prevState,
+                                link: data.error
+                            }))
+                            setIsOK(false)
+                        }
                     })
                     .catch(error => {
-                        setStatus("nie usaloi sie")
+                        setRespones( prev => ({
+                            ...prev,
+                            link : "is not OK"
+                        }))
                         console.error('There was a problem with your fetch operation:', error);
                         // Obsługa błędów logowania
                     });
@@ -47,7 +79,7 @@ export default function MakeTransfer(){
                 <input value={amount} onChange={(e) => setAmount(e.target.value)}/>
                 <p></p>
                 <button type="submit">{"send"}</button>
-                <p>{status}</p>
+                <p>{ isOK ? <a href={respones.link}>link do potwierdzenia transakcji</a> : respones.link ? respones.link : "nie udało się :(("}</p>
             </form>
         </>
     )

@@ -2,7 +2,9 @@ package endpoints
 
 import (
 	"WDB/views"
+	"fmt"
 	"net/http"
+	"strconv"
 )
 
 type Transfer struct {
@@ -13,7 +15,16 @@ type Transfer struct {
 
 func (h *Handlers) GetTransfers(w http.ResponseWriter, r *http.Request) {
 
-	res, err := h.DB.Query("select sender, reciver,value from transfers")
+	cookie, err := r.Cookie("accessToken")
+	if err != nil {
+		views.ResponseWithError(w, 401, "where cookie?")
+		return
+	}
+	id, _ := strconv.Atoi(r.URL.Query().Get("id"))
+
+	fmt.Printf("id := %v\n")
+	res, err := h.DB.Query("select sender from transfers where sender = ? ", id)
+	cookie.Value = "asd"
 	if err != nil {
 		views.ResponseWithError(w, 500, "Error querying the database")
 		return
@@ -24,7 +35,7 @@ func (h *Handlers) GetTransfers(w http.ResponseWriter, r *http.Request) {
 	for res.Next() {
 		var transfer Transfer
 		// zakładając, że tabela 'transfers' ma kolumny 'sender', 'receiver' i 'value'
-		if err := res.Scan(&transfer.Sender, &transfer.Reciver, &transfer.Value); err != nil {
+		if err := res.Scan(&transfer.Sender /*, &transfer.Reciver, &transfer.Value*/); err != nil {
 			views.ResponseWithError(w, 500, "Error reading data")
 			return
 		}

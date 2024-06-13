@@ -24,7 +24,7 @@ func (h *Handlers) ResetPassPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filePath := "/home/dalinarkholin/GolandProjects/WDB/backend/endpoints/page.html" // Zmień "twoja_strona.html" na nazwę Twojego pliku HTML
+	filePath := "/home/dalinarkholin/GolandProjects/WDB/backend/endpoints/pages/resetPassPage.html" // Zmień "twoja_strona.html" na nazwę Twojego pliku HTML
 	// Odczytanie pliku HTML
 	htmlContent, err := os.ReadFile(filePath)
 	if err != nil {
